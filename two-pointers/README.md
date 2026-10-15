@@ -65,7 +65,7 @@ Output: [1,2]
 
 **Complexity:** Time `O(n)` · Space `O(1)`
 
-**My mistakes / remember:** _(fill in)_
+
 
 [Back to index](#index)
 
@@ -100,7 +100,6 @@ Output: true      (empty after cleaning)
 
 **Complexity:** Time `O(n)` · Space `O(1)`
 
-**My mistakes / remember:** _(fill in)_
 
 [Back to index](#index)
 
@@ -131,7 +130,6 @@ Output: 1
 
 **Complexity:** Time `O(n)` · Space `O(1)`
 
-**My mistakes / remember:** _(fill in)_
 
 [Back to index](#index)
 
@@ -165,7 +163,6 @@ Output: [[0,0,0]]
 
 **Complexity:** Time `O(n^2)` · Space `O(1)` extra (ignoring sort and output)
 
-**My mistakes / remember:** _(fill in)_
 
 [Back to index](#index)
 
@@ -196,7 +193,6 @@ Output: [0]
 
 **Complexity:** Time `O(n)` · Space `O(1)`
 
-**My mistakes / remember:** _(fill in)_
 
 [Back to index](#index)
 
@@ -228,7 +224,6 @@ Output: 5, nums = [0,1,2,3,4,_,_,_,_,_]
 
 **Complexity:** Time `O(n)` · Space `O(1)`
 
-**My mistakes / remember:** _(fill in)_
 
 [Back to index](#index)
 
@@ -263,6 +258,5 @@ Output: [1]
 
 **Complexity:** Time `O(m + n)` · Space `O(1)`
 
-**My mistakes / remember:** _(fill in)_
 
 [Back to index](#index)
