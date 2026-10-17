@@ -13,7 +13,7 @@ Quick-revision notes for the **Two Pointer** pattern. Click a problem in the ind
 
 | Style | Setup | Used in |
 |-------|-------|---------|
-| **Opposite ends** | `left = 0`, `right = n - 1`, move toward each other | 167, 125, 11, 15 |
+| **Opposite ends** | `left = 0`, `right = n - 1`, move toward each other | 167, 125, 11, 15, 977 |
 | **Same direction** (slow / fast) | `slow` writes, `fast` reads, both move forward | 283, 26 |
 | **Merge from the back** | pointers at the end of each array, fill from the end | 88 |
 
@@ -30,8 +30,9 @@ Quick-revision notes for the **Two Pointer** pattern. Click a problem in the ind
 | 283 | [Move Zeroes](#283-move-zeroes) | Easy | Slow / fast | [Java](LC283_MoveZeroes.java) |
 | 26 | [Remove Duplicates from Sorted Array](#26-remove-duplicates-from-sorted-array) | Easy | Slow / fast | [Java](LC26_RemoveDuplicates.java) |
 | 88 | [Merge Sorted Array](#88-merge-sorted-array) | Easy | Merge from back | [Java](LC88_MergeSortedArray.java) |
+| 977 | [Squares of a Sorted Array](#977-squares-of-a-sorted-array) | Easy | Opposite ends | [Java](LC977_SquaresOfSortedArray.java) |
 
-**Total solved: 7**
+**Total solved: 8**
 
 ---
 
@@ -258,5 +259,36 @@ Output: [1]
 
 **Complexity:** Time `O(m + n)` · Space `O(1)`
 
+
+[Back to index](#index)
+
+
+---
+
+## 977. Squares of a Sorted Array
+
+[LeetCode](https://leetcode.com/problems/squares-of-a-sorted-array/) · Easy · [Solution](LC977_SquaresOfSortedArray.java)
+
+**Problem:** Given a sorted array `nums` (it can have negatives), return an array of the squares of each number, also sorted.
+
+**Key points**
+- Input is sorted, but squaring negatives breaks the order
+- The largest square is always at one of the two ends
+- Result must be sorted in non-decreasing order
+
+**Examples**
+```
+Input:  nums = [-4,-1,0,3,10]
+Output: [0,1,9,16,100]
+
+Input:  nums = [-7,-3,2,3,11]
+Output: [4,9,9,49,121]
+```
+
+**Constraints:** `1 <= n <= 10^4`, `-10^4 <= nums[i] <= 10^4`, sorted non-decreasing
+
+**Approach:** `left` at start, `right` at end, and a result array filled from the **back**. Compare `|nums[left]|` and `|nums[right]|`. The larger one is squared and placed at the current back position, then that pointer moves inward.
+
+**Complexity:** Time `O(n)` · Space `O(n)` (result array)
 
 [Back to index](#index)
