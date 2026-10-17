@@ -13,7 +13,7 @@ Quick-revision notes for the **Sliding Window** pattern. Click a problem in the 
 
 | Style | Setup | Used in |
 |-------|-------|---------|
-| **Fixed size window** | Window length is always `k`. Add the new element on the right, remove the old one on the left | 643, 239, 567 |
+| **Fixed size window** | Window length is always `k`. Add the new element on the right, remove the old one on the left | 643, 239, 567, 1343 |
 | **Variable size window** | `right` expands the window. `left` shrinks it when the condition breaks | 3, 209, 424, 1004 |
 
 ---
@@ -29,8 +29,9 @@ Quick-revision notes for the **Sliding Window** pattern. Click a problem in the 
 | 209 | [Minimum Size Subarray Sum](#209-minimum-size-subarray-sum) | Medium | Variable | [Java](LC209_MinSizeSubArraySum.java) |
 | 424 | [Longest Repeating Character Replacement](#424-longest-repeating-character-replacement) | Medium | Variable | [Java](LC424_LongRepeatingCharReplacement.java) |
 | 1004 | [Max Consecutive Ones III](#1004-max-consecutive-ones-iii) | Medium | Variable | [Java](LC1004_MaxConsecutiveOnesIII.java) |
+| 1343 | [Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold](#1343-number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold) | Medium | Fixed | [Java](LC1343_SubarraysSizeKAvgThreshold.java) |
 
-**Total solved: 7**
+**Total solved: 8**
 
 ---
 
@@ -242,6 +243,36 @@ Output: 10
 **Constraints:** `1 <= n <= 10^5`, `nums[i]` is `0` or `1`, `0 <= k <= n`
 
 **Approach:** Expand `right` and count the zeros in the window. If zeros `> k`, shrink from the left until zeros `<= k`. Track the max window length.
+
+**Complexity:** Time `O(n)` · Space `O(1)`
+
+[Back to index](#index)
+
+---
+
+## 1343. Number of Sub-arrays of Size K and Average Greater than or Equal to Threshold
+
+[LeetCode](https://leetcode.com/problems/number-of-sub-arrays-of-size-k-and-average-greater-than-or-equal-to-threshold/) · Medium · [Solution](LC1343_SubarraysSizeKAvgThreshold.java)
+
+**Problem:** Given `arr`, `k` and `threshold`, count the sub-arrays of size `k` whose average is `>= threshold`.
+
+**Key points**
+- Window length is exactly `k`
+- Averages are not always integers
+- Return the **count** of valid sub-arrays, not the sub-arrays
+
+**Examples**
+```
+Input:  arr = [2,2,2,2,5,5,5,8], k = 3, threshold = 4
+Output: 3      ([2,5,5], [5,5,5], [5,5,8])
+
+Input:  arr = [11,13,17,23,29,31,7,5,2,3], k = 3, threshold = 5
+Output: 6
+```
+
+**Constraints:** `1 <= n <= 10^5`, `1 <= arr[i] <= 10^4`, `1 <= k <= n`, `0 <= threshold <= 10^4`
+
+**Approach:** Keep the window sum. Instead of dividing, compare `sum >= threshold * k` to avoid decimals. Slide by adding the new right element and removing the old left one, and count every window that passes.
 
 **Complexity:** Time `O(n)` · Space `O(1)`
 
