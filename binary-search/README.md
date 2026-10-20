@@ -8,6 +8,7 @@ Quick-revision notes for the **Binary Search** pattern. Click a problem in the i
 - The question asks for **O(log n)** time
 - You need to find a target, or the **position where it would go**
 - A 2D structure can be treated as one sorted list
+- The array is sorted but **rotated** (for example `[4,5,6,7,0,1,2]`)
 
 ## Styles
 
@@ -17,7 +18,8 @@ Quick-revision notes for the **Binary Search** pattern. Click a problem in the i
 | **Insert position** | Same loop, but when not found return `left` (first index with a bigger value) | 35 |
 | **2D as 1D** | Search `0 ... m*n - 1`, convert with `row = mid / n`, `col = mid % n` | 74 |
 | **First / last position** | On a match, save `mid` as the answer, then keep searching left (first) or right (last) | 34 |
-| **Search on the answer** | No array. Binary search on a range of values using a true/false check that flips only once | 278 |
+| **Search on the answer** | No array. Binary search on a range of values using a check that flips only once | 278, 69 |
+| **Rotated array** | Compare `nums[mid]` with `nums[right]` (or find which half is sorted) to decide which half to keep | 153, 33 |
 
 ---
 
@@ -30,8 +32,11 @@ Quick-revision notes for the **Binary Search** pattern. Click a problem in the i
 | 74 | [Search a 2D Matrix](#74-search-a-2d-matrix) | Medium | 2D as 1D | [Java](LC74_Search2DMatrix.java) |
 | 34 | [Find First and Last Position of Element in Sorted Array](#34-find-first-and-last-position-of-element-in-sorted-array) | Medium | First / last position | [Java](LC34_FindFirstAndLastPosition.java) |
 | 278 | [First Bad Version](#278-first-bad-version) | Easy | Search on the answer | [Java](LC278_FirstBadVersion.java) |
+| 69 | [Sqrt(x)](#69-sqrtx) | Easy | Search on the answer | [Java](LC69_Sqrtx.java) |
+| 153 | [Find Minimum in Rotated Sorted Array](#153-find-minimum-in-rotated-sorted-array) | Medium | Rotated array | [Java](LC153_FindMinRotatedSortedArray.java) |
+| 33 | [Search in Rotated Sorted Array](#33-search-in-rotated-sorted-array) | Medium | Rotated array | [Java](LC33_SearchRotatedSortedArray.java) |
 
-**Total solved: 5**
+**Total solved: 8**
 
 ---
 
@@ -187,5 +192,101 @@ Output: 1
 **Approach:** `left = 1`, `right = n`. If `isBadVersion(mid)` is true, the answer is `mid` or earlier, so `right = mid - 1`. Otherwise `left = mid + 1`. When the loop ends, `left` is the first bad version.
 
 **Complexity:** Time `O(log n)` (API calls) · Space `O(1)`
+
+[Back to index](#index)
+
+---
+
+## 69. Sqrt(x)
+
+[LeetCode](https://leetcode.com/problems/sqrtx/) · Easy · [Solution](LC69_Sqrtx.java)
+
+**Problem:** Given a non-negative integer `x`, return the square root of `x` rounded down to the nearest integer. Do not use built-in exponent functions.
+
+**Key points**
+- Answer is the **largest** integer whose square is `<= x`
+- No array, you search on the range of possible answers `0 ... x`
+- `mid * mid` can overflow `int`, so multiply as `(long) mid * mid`
+
+**Examples**
+```
+Input:  x = 4
+Output: 2
+
+Input:  x = 8
+Output: 2      (sqrt is 2.828..., rounded down)
+```
+
+**Constraints:** `0 <= x <= 2^31 - 1`
+
+**Approach:** `left = 0`, `right = x`. Compute `long square = (long) mid * mid`. Equal → return `mid`. Smaller → `left = mid + 1`. Bigger → `right = mid - 1`. When the loop ends, `right` is the largest number whose square fits, so return `right`. (Another way: Newton's method, `guess = (guess + x / guess) / 2`.)
+
+**Complexity:** Time `O(log x)` · Space `O(1)`
+
+[Back to index](#index)
+
+---
+
+## 153. Find Minimum in Rotated Sorted Array
+
+[LeetCode](https://leetcode.com/problems/find-minimum-in-rotated-sorted-array/) · Medium · [Solution](LC153_FindMinRotatedSortedArray.java)
+
+**Problem:** A sorted array with unique values was rotated between `1` and `n` times. Return the minimum element.
+
+**Key points**
+- The minimum is the point where the order "drops"
+- Must run in `O(log n)`
+- Compare `nums[mid]` with `nums[right]`, not with `nums[left]`
+
+**Examples**
+```
+Input:  nums = [3,4,5,1,2]
+Output: 1
+
+Input:  nums = [4,5,6,7,0,1,2]
+Output: 0
+
+Input:  nums = [11,13,15,17]
+Output: 11
+```
+
+**Constraints:** `1 <= n <= 5000`, `-5000 <= nums[i] <= 5000`, unique values, sorted and rotated
+
+**Approach:** `while (left < right)`. If `nums[mid] > nums[right]`, the drop is to the right, so `left = mid + 1`. Otherwise `mid` could be the minimum, so `right = mid`. When `left == right`, return `nums[left]`.
+
+**Complexity:** Time `O(log n)` · Space `O(1)`
+
+[Back to index](#index)
+
+---
+
+## 33. Search in Rotated Sorted Array
+
+[LeetCode](https://leetcode.com/problems/search-in-rotated-sorted-array/) · Medium · [Solution](LC33_SearchRotatedSortedArray.java)
+
+**Problem:** A sorted array with distinct values may be rotated at an unknown point. Given `target`, return its index or `-1`.
+
+**Key points**
+- Must run in `O(log n)`
+- At any `mid`, one half (left or right) is always sorted
+- Check whether the target lies inside the sorted half, then keep that half or the other one
+
+**Examples**
+```
+Input:  nums = [4,5,6,7,0,1,2], target = 0
+Output: 4
+
+Input:  nums = [4,5,6,7,0,1,2], target = 3
+Output: -1
+
+Input:  nums = [1], target = 0
+Output: -1
+```
+
+**Constraints:** `1 <= n <= 5000`, `-10^4 <= nums[i], target <= 10^4`, unique values
+
+**Approach:** `while (left < right)`. If `nums[mid] == target`, return `mid`. If `nums[left] <= nums[mid]`, the left half is sorted: if `nums[left] <= target <= nums[mid]`, set `right = mid`, else `left = mid + 1`. Otherwise the right half is sorted: if `nums[mid] < target <= nums[right]`, set `left = mid + 1`, else `right = mid`. After the loop, return `left` if `nums[left] == target`, else `-1`.
+
+**Complexity:** Time `O(log n)` · Space `O(1)`
 
 [Back to index](#index)
