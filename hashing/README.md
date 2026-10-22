@@ -15,6 +15,7 @@ Quick-revision notes for the **Hashing** pattern. Click a problem in the index t
 |-------|-----------|---------|
 | **Seen-before** | `HashSet`, `add` returns `false` if the value is already there | 217 |
 | **Lookup** | `HashMap<value, index>`, look up the complement before storing the current value | 1 |
+| **Frequency count** | `int[26]` array (or `HashMap<char, count>`), `++` for one string and `--` for the other | 242 |
 
 ---
 
@@ -24,8 +25,9 @@ Quick-revision notes for the **Hashing** pattern. Click a problem in the index t
 |---|---------|------------|-------|----------|
 | 217 | [Contains Duplicate](#217-contains-duplicate) | Easy | Seen-before | [Java](LC217_ContainsDuplicate.java) |
 | 1 | [Two Sum](#1-two-sum) | Easy | Lookup | [Java](LC1_TwoSum.java) |
+| 242 | [Valid Anagram](#242-valid-anagram) | Easy | Frequency count | [Java](LC242_ValidAnagram.java) |
 
-**Total solved: 2**
+**Total solved: 3**
 
 ---
 
@@ -91,5 +93,36 @@ Output: [0,1]
 **Approach:** Keep a `HashMap<value, index>`. For each `nums[i]`, look up `target - nums[i]`. If it is in the map, return its stored index and `i`. Otherwise store `nums[i]` with its index and continue.
 
 **Complexity:** Time `O(n)` · Space `O(n)`
+
+[Back to index](#index)
+
+---
+
+## 242. Valid Anagram
+
+[LeetCode](https://leetcode.com/problems/valid-anagram/) · Easy · [Solution](LC242_ValidAnagram.java)
+
+**Problem:** Given two strings `s` and `t`, return `true` if `t` is an anagram of `s` (same letters with the same counts, in any order), and `false` otherwise.
+
+**Key points**
+- Different lengths can never be anagrams, so check the length first
+- Both strings contain only lowercase letters, so `int[26]` is enough
+- `int[26]` is much faster than a `HashMap` (no boxing, no hashing)
+- For Unicode input, 26 slots are not enough, so use a `HashMap`
+
+**Examples**
+```
+Input:  s = "anagram", t = "nagaram"
+Output: true
+
+Input:  s = "rat", t = "car"
+Output: false
+```
+
+**Constraints:** `1 <= s.length, t.length <= 5 * 10^4`, lowercase English letters only
+
+**Approach:** If the lengths differ, return `false`. Use `count = new int[26]`. For each index, do `count[s[i] - 'a']++` and `count[t[i] - 'a']--`. Then every count must be `0`. Alternative: build a `HashMap` of character counts for each string and compare them with `equals` (slower, but works for any characters, including Unicode).
+
+**Complexity:** Time `O(n)` · Space `O(1)` (26 slots), or `O(k)` for a `HashMap` with `k` distinct characters
 
 [Back to index](#index)
