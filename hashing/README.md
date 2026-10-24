@@ -15,7 +15,8 @@ Quick-revision notes for the **Hashing** pattern. Click a problem in the index t
 |-------|-----------|---------|
 | **Seen-before** | `HashSet`, `add` returns `false` if the value is already there | 217 |
 | **Lookup** | `HashMap<value, index>`, look up the complement before storing the current value | 1 |
-| **Frequency count** | `int[26]` array (or `HashMap<char, count>`), `++` for one string and `--` for the other | 242 |
+| **Frequency count** | `int[26]` array (or `HashMap<char, count>`), count first, then check or compare | 242, 387 |
+| **Set + run start** | Put everything in a `HashSet`, only start counting from a number whose `x - 1` is missing | 128 |
 
 ---
 
@@ -26,8 +27,10 @@ Quick-revision notes for the **Hashing** pattern. Click a problem in the index t
 | 217 | [Contains Duplicate](#217-contains-duplicate) | Easy | Seen-before | [Java](LC217_ContainsDuplicate.java) |
 | 1 | [Two Sum](#1-two-sum) | Easy | Lookup | [Java](LC1_TwoSum.java) |
 | 242 | [Valid Anagram](#242-valid-anagram) | Easy | Frequency count | [Java](LC242_ValidAnagram.java) |
+| 387 | [First Unique Character in a String](#387-first-unique-character-in-a-string) | Easy | Frequency count | [Java](LC387_FirstUniqueCharacter.java) |
+| 128 | [Longest Consecutive Sequence](#128-longest-consecutive-sequence) | Medium | Set + run start | [Java](LC128_LongestConsecutiveSequence.java) |
 
-**Total solved: 3**
+**Total solved: 5**
 
 ---
 
@@ -124,5 +127,75 @@ Output: false
 **Approach:** If the lengths differ, return `false`. Use `count = new int[26]`. For each index, do `count[s[i] - 'a']++` and `count[t[i] - 'a']--`. Then every count must be `0`. Alternative: build a `HashMap` of character counts for each string and compare them with `equals` (slower, but works for any characters, including Unicode).
 
 **Complexity:** Time `O(n)` · Space `O(1)` (26 slots), or `O(k)` for a `HashMap` with `k` distinct characters
+
+[Back to index](#index)
+
+
+---
+
+## 387. First Unique Character in a String
+
+[LeetCode](https://leetcode.com/problems/first-unique-character-in-a-string/) · Easy · [Solution](LC387_FirstUniqueCharacter.java)
+
+**Problem:** Given a string `s`, return the index of the first character that does not repeat anywhere in the string. Return `-1` if there is none.
+
+**Key points**
+- Needs two passes: first count every character, then find the first one with a count of `1`
+- The second pass must go through the **string** (not the map), because a `HashMap` has no guaranteed order
+- Only lowercase letters, so `int[26]` is enough and much faster than a `HashMap`
+- Removing a character from a map on its second sighting breaks when it appears 3 times
+
+**Examples**
+```
+Input:  s = "leetcode"
+Output: 0
+
+Input:  s = "loveleetcode"
+Output: 2
+
+Input:  s = "aabb"
+Output: -1
+```
+
+**Constraints:** `1 <= s.length <= 10^5`, lowercase English letters only
+
+**Approach:** Count each letter with `count[c - 'a']++`. Then go through the string again and return the first index whose count is `1`. If none, return `-1`. Other ways: a `HashMap` with `merge(c, 1, Integer::sum)` for the counts, or one pass that stores the first index and marks repeated characters as `-1`, then takes the smallest remaining index.
+
+**Complexity:** Time `O(n)` · Space `O(1)` (26 slots), or `O(k)` for a `HashMap`
+
+[Back to index](#index)
+
+---
+
+## 128. Longest Consecutive Sequence
+
+[LeetCode](https://leetcode.com/problems/longest-consecutive-sequence/) · Medium · [Solution](LC128_LongestConsecutiveSequence.java)
+
+**Problem:** Given an unsorted array `nums`, return the length of the longest sequence of consecutive integers (for example `1, 2, 3, 4`).
+
+**Key points**
+- Must run in `O(n)`, so sorting (`O(n log n)`) is not allowed
+- Order in the array does not matter, and duplicates do not count twice
+- Only start counting from the **beginning** of a run (a number whose `x - 1` is not in the set), otherwise the same run is counted many times
+- Loop over the **set**, not the array, so duplicates do not repeat the work
+- The array can be empty, the answer is then `0`
+
+**Examples**
+```
+Input:  nums = [100,4,200,1,3,2]
+Output: 4      ([1,2,3,4])
+
+Input:  nums = [0,3,7,2,5,8,4,6,0,1]
+Output: 9
+
+Input:  nums = [1,0,1,2]
+Output: 3
+```
+
+**Constraints:** `0 <= n <= 10^5`, `-10^9 <= nums[i] <= 10^9`
+
+**Approach:** Put all numbers into a `HashSet`. For each `x` in the set, if `x - 1` is **not** in the set, `x` starts a run. Walk upward (`x + 1`, `x + 2`, ...) while the next number is in the set, and track the longest length.
+
+**Complexity:** Time `O(n)` · Space `O(n)`
 
 [Back to index](#index)
