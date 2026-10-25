@@ -17,6 +17,7 @@ Quick-revision notes for the **Hashing** pattern. Click a problem in the index t
 | **Lookup** | `HashMap<value, index>`, look up the complement before storing the current value | 1 |
 | **Frequency count** | `int[26]` array (or `HashMap<char, count>`), count first, then check or compare | 242, 387 |
 | **Set + run start** | Put everything in a `HashSet`, only start counting from a number whose `x - 1` is missing | 128 |
+| **Group by key** | `HashMap<key, List>`, build a key that is the same for every item in a group (for example the sorted letters) | 49 |
 
 ---
 
@@ -29,8 +30,9 @@ Quick-revision notes for the **Hashing** pattern. Click a problem in the index t
 | 242 | [Valid Anagram](#242-valid-anagram) | Easy | Frequency count | [Java](LC242_ValidAnagram.java) |
 | 387 | [First Unique Character in a String](#387-first-unique-character-in-a-string) | Easy | Frequency count | [Java](LC387_FirstUniqueCharacter.java) |
 | 128 | [Longest Consecutive Sequence](#128-longest-consecutive-sequence) | Medium | Set + run start | [Java](LC128_LongestConsecutiveSequence.java) |
+| 49 | [Group Anagrams](#49-group-anagrams) | Medium | Group by key | [Java](LC49_GroupAnagrams.java) |
 
-**Total solved: 5**
+**Total solved: 6**
 
 ---
 
@@ -197,5 +199,40 @@ Output: 3
 **Approach:** Put all numbers into a `HashSet`. For each `x` in the set, if `x - 1` is **not** in the set, `x` starts a run. Walk upward (`x + 1`, `x + 2`, ...) while the next number is in the set, and track the longest length.
 
 **Complexity:** Time `O(n)` · Space `O(n)`
+
+[Back to index](#index)
+
+---
+
+## 49. Group Anagrams
+
+[LeetCode](https://leetcode.com/problems/group-anagrams/) · Medium · [Solution](LC49_GroupAnagrams.java)
+
+**Problem:** Given an array of strings `strs`, group the anagrams together. The groups can be returned in any order.
+
+**Key points**
+- Comparing every word with every other word is `O(n^2)` and too slow
+- Anagrams have the **same letters when sorted**, so the sorted word works as a label (key)
+- The map is `HashMap<label, list of words>`
+- Use `new String(chars)` to turn the sorted `char[]` back into a `String` (`toString()` prints the array reference instead)
+- An empty string is valid and forms its own group
+
+**Examples**
+```
+Input:  strs = ["eat","tea","tan","ate","nat","bat"]
+Output: [["bat"],["nat","tan"],["ate","eat","tea"]]
+
+Input:  strs = [""]
+Output: [[""]]
+
+Input:  strs = ["a"]
+Output: [["a"]]
+```
+
+**Constraints:** `1 <= n <= 10^4`, `0 <= strs[i].length <= 100`, lowercase English letters only
+
+**Approach:** For each word, sort its letters to make a label (`"eat"` becomes `"aet"`). If the label is not in the map yet, create an empty list for it. Add the word to that list. At the end, return all the lists in the map (`new ArrayList<>(map.values())`). Another way to build the key: count the letters in an `int[26]` and convert it to a `String` (do not use the `int[]` itself as a key, because arrays are compared by reference).
+
+**Complexity:** Time `O(n * L log L)` where `L` is the longest word · Space `O(n * L)`
 
 [Back to index](#index)
