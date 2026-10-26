@@ -15,9 +15,10 @@ Quick-revision notes for the **Hashing** pattern. Click a problem in the index t
 |-------|-----------|---------|
 | **Seen-before** | `HashSet`, `add` returns `false` if the value is already there | 217 |
 | **Lookup** | `HashMap<value, index>`, look up the complement before storing the current value | 1 |
-| **Frequency count** | `int[26]` array (or `HashMap<char, count>`), count first, then check or compare | 242, 387 |
+| **Frequency count** | `int[26]` array (or `HashMap<char, count>`), count first, then check or compare | 242, 387, 383 |
 | **Set + run start** | Put everything in a `HashSet`, only start counting from a number whose `x - 1` is missing | 128 |
 | **Group by key** | `HashMap<key, List>`, build a key that is the same for every item in a group (for example the sorted letters) | 49 |
+| **Two-way mapping** | Check the mapping in both directions: two maps (`s to t` and `t to s`) or last-seen positions of each character | 205 |
 
 ---
 
@@ -31,8 +32,10 @@ Quick-revision notes for the **Hashing** pattern. Click a problem in the index t
 | 387 | [First Unique Character in a String](#387-first-unique-character-in-a-string) | Easy | Frequency count | [Java](LC387_FirstUniqueCharacter.java) |
 | 128 | [Longest Consecutive Sequence](#128-longest-consecutive-sequence) | Medium | Set + run start | [Java](LC128_LongestConsecutiveSequence.java) |
 | 49 | [Group Anagrams](#49-group-anagrams) | Medium | Group by key | [Java](LC49_GroupAnagrams.java) |
+| 383 | [Ransom Note](#383-ransom-note) | Easy | Frequency count | [Java](LC383_RansomNote.java) |
+| 205 | [Isomorphic Strings](#205-isomorphic-strings) | Easy | Two-way mapping | [Java](LC205_IsomorphicStrings.java) |
 
-**Total solved: 6**
+**Total solved: 8**
 
 ---
 
@@ -234,5 +237,74 @@ Output: [["a"]]
 **Approach:** For each word, sort its letters to make a label (`"eat"` becomes `"aet"`). If the label is not in the map yet, create an empty list for it. Add the word to that list. At the end, return all the lists in the map (`new ArrayList<>(map.values())`). Another way to build the key: count the letters in an `int[26]` and convert it to a `String` (do not use the `int[]` itself as a key, because arrays are compared by reference).
 
 **Complexity:** Time `O(n * L log L)` where `L` is the longest word · Space `O(n * L)`
+
+[Back to index](#index)
+
+
+---
+
+## 383. Ransom Note
+
+[LeetCode](https://leetcode.com/problems/ransom-note/) · Easy · [Solution](LC383_RansomNote.java)
+
+**Problem:** Given `ransomNote` and `magazine`, return `true` if the note can be built from the letters of the magazine. Each magazine letter can be used only once.
+
+**Key points**
+- The magazine can have **extra** letters, so you need "at least as many", not an exact match
+- Count the letters of the note with `++` and the magazine with `--`, then no count may stay positive
+- `entrySet().containsAll(...)` is **wrong** here, because it needs the counts to be exactly equal
+- Quick exit: if the note is longer than the magazine, return `false`
+
+**Examples**
+```
+Input:  ransomNote = "a", magazine = "b"
+Output: false
+
+Input:  ransomNote = "aa", magazine = "ab"
+Output: false
+
+Input:  ransomNote = "aa", magazine = "aab"
+Output: true
+```
+
+**Constraints:** `1 <= length <= 10^5` for both strings, lowercase English letters only
+
+**Approach:** Use `count = new int[26]`. For each letter of `ransomNote` do `count[c - 'a']++`, and for each letter of `magazine` do `count[c - 'a']--`. If any count is still greater than `0`, the magazine is missing letters, so return `false`. Otherwise return `true`. Another way: one `HashMap` of the magazine's letter counts, and use up one letter for every letter of the note, returning `false` when a letter is missing or used up.
+
+**Complexity:** Time `O(r + m)` · Space `O(1)` (26 slots), or `O(k)` for a `HashMap`
+
+[Back to index](#index)
+
+---
+
+## 205. Isomorphic Strings
+
+[LeetCode](https://leetcode.com/problems/isomorphic-strings/) · Easy · [Solution](LC205_IsomorphicStrings.java)
+
+**Problem:** Two strings `s` and `t` are isomorphic if the characters of `s` can be replaced to get `t`. Every occurrence of a character must map to the same character, and no two characters may map to the same one.
+
+**Key points**
+- It is a one-to-one mapping, so check **both directions** (`s to t` and `t to s`)
+- Comparing running frequency counts is **not enough**: `"aba"` and `"abb"` have matching counts but are not isomorphic
+- Characters can be any ASCII character, so use `int[128]` (not `int[26]`)
+- Don't compare two `Integer` objects from a map with `==` (Integer cache trap)
+
+**Examples**
+```
+Input:  s = "egg", t = "add"
+Output: true
+
+Input:  s = "f11", t = "b23"
+Output: false
+
+Input:  s = "paper", t = "title"
+Output: true
+```
+
+**Constraints:** `1 <= s.length <= 5 * 10^4`, `t.length == s.length`, any valid ASCII character
+
+**Approach:** Keep the last position + 1 of every character in two `int[128]` arrays (`0` means never seen). At index `i`, if `lastS[s[i]] != lastT[t[i]]`, the characters were last seen at different places, so return `false`. Then set both to `i + 1`. Another way: two `HashMap<Character, Character>` (`s to t` and `t to s`), and return `false` if a stored mapping disagrees with the current pair.
+
+**Complexity:** Time `O(n)` · Space `O(1)` (128 slots), or `O(k)` for the HashMaps
 
 [Back to index](#index)
