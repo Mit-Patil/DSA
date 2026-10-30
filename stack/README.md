@@ -16,6 +16,7 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | **Matching** | Push openers, and when a closer arrives, pop and check that the top is its partner | 20 |
 | **Stack with extra data** | Each stack item carries more than its value (for example the minimum so far), so one pop restores everything | 155 |
 | **Evaluate / combine** | Push numbers, and when an operator arrives, pop the last two, combine them and push the result | 150 |
+| **Monotonic stack** | Keep the stack in sorted order (indices of waiting items). Pop while the new item breaks the order, and each pop finds an answer | 739 |
 
 ---
 
@@ -26,8 +27,9 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | 20 | [Valid Parentheses](#20-valid-parentheses) | Easy | Matching | [Java](LC20_ValidParentheses.java) |
 | 155 | [Min Stack](#155-min-stack) | Medium | Stack with extra data | [Java](LC155_MinStack.java) |
 | 150 | [Evaluate Reverse Polish Notation](#150-evaluate-reverse-polish-notation) | Medium | Evaluate / combine | [Java](LC150_EvaluateReversePolishNotation.java) |
+| 739 | [Daily Temperatures](#739-daily-temperatures) | Medium | Monotonic stack | [Java](LC739_DailyTemperatures.java) |
 
-**Total solved: 3**
+**Total solved: 4**
 
 ---
 
@@ -130,6 +132,42 @@ Output: 22
 **Constraints:** `1 <= tokens.length <= 10^4`, each token is an operator or an integer in `[-200, 200]`, no division by zero, the expression is valid
 
 **Approach:** Go through the tokens with a stack of integers. If the token is a number, push it. If it is an operator, pop the second value, then the first value, compute `first op second`, and push the result. At the end, the single value left in the stack is the answer.
+
+**Complexity:** Time `O(n)` · Space `O(n)`
+
+[Back to index](#index)
+
+---
+
+## 739. Daily Temperatures
+
+[LeetCode](https://leetcode.com/problems/daily-temperatures/) · Medium · [Solution](LC739_DailyTemperatures.java)
+
+**Problem:** Given an array `temperatures`, return an array `answer` where `answer[i]` is the number of days to wait after day `i` to get a warmer temperature. If there is no warmer day, `answer[i]` is `0`.
+
+**Key points**
+- Store **indices** in the stack, so the distance in days is `today - prevIndex` and the temperature is `temperatures[index]`
+- The stack holds days that are still waiting for a warmer day, with temperatures going down from bottom to top
+- Use a `while` loop, because one warm day can answer several waiting days
+- Use a strict `<`, so an equal temperature does not count as warmer
+- Days left in the stack at the end keep the default answer `0`
+- The nested loop is still `O(n)`, because every index is pushed once and popped at most once
+
+**Examples**
+```
+Input:  temperatures = [73,74,75,71,69,72,76,73]
+Output: [1,1,4,2,1,1,0,0]
+
+Input:  temperatures = [30,40,50,60]
+Output: [1,1,1,0]
+
+Input:  temperatures = [30,60,90]
+Output: [1,1,0]
+```
+
+**Constraints:** `1 <= n <= 10^5`, `30 <= temperatures[i] <= 100`
+
+**Approach:** Go through the days from left to right with a stack of indices. While the stack is not empty and `temperatures[stack.peek()] < temperatures[i]`, pop `prev` and set `answer[prev] = i - prev`. Then push `i`. Another way: use an `int[]` as the stack with a `top` counter, which avoids boxing `Integer` objects and is faster in practice.
 
 **Complexity:** Time `O(n)` · Space `O(n)`
 
