@@ -16,7 +16,7 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | **Matching** | Push openers, and when a closer arrives, pop and check that the top is its partner | 20 |
 | **Stack with extra data** | Each stack item carries more than its value (for example the minimum so far), so one pop restores everything | 155 |
 | **Evaluate / combine** | Push numbers, and when an operator arrives, pop the last two, combine them and push the result | 150 |
-| **Monotonic stack** | Keep the stack in sorted order (indices of waiting items). Pop while the new item breaks the order, and each pop finds an answer | 739 |
+| **Monotonic stack** | Keep the stack in sorted order. Pop while the new item breaks the order, and each pop finds an answer (store indices for distances, values for the answer itself, optionally in a `HashMap`) | 739, 496 |
 
 ---
 
@@ -28,8 +28,9 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | 155 | [Min Stack](#155-min-stack) | Medium | Stack with extra data | [Java](LC155_MinStack.java) |
 | 150 | [Evaluate Reverse Polish Notation](#150-evaluate-reverse-polish-notation) | Medium | Evaluate / combine | [Java](LC150_EvaluateReversePolishNotation.java) |
 | 739 | [Daily Temperatures](#739-daily-temperatures) | Medium | Monotonic stack | [Java](LC739_DailyTemperatures.java) |
+| 496 | [Next Greater Element I](#496-next-greater-element-i) | Easy | Monotonic stack | [Java](LC496_NextGreaterElementI.java) |
 
-**Total solved: 4**
+**Total solved: 5**
 
 ---
 
@@ -170,5 +171,38 @@ Output: [1,1,0]
 **Approach:** Go through the days from left to right with a stack of indices. While the stack is not empty and `temperatures[stack.peek()] < temperatures[i]`, pop `prev` and set `answer[prev] = i - prev`. Then push `i`. Another way: use an `int[]` as the stack with a `top` counter, which avoids boxing `Integer` objects and is faster in practice.
 
 **Complexity:** Time `O(n)` · Space `O(n)`
+
+[Back to index](#index)
+
+---
+
+## 496. Next Greater Element I
+
+[LeetCode](https://leetcode.com/problems/next-greater-element-i/) · Easy · [Solution](LC496_NextGreaterElementI.java)
+
+**Problem:** `nums1` is a subset of `nums2`. For each value in `nums1`, find its position in `nums2` and return the first greater value to its right, or `-1` if there is none.
+
+**Key points**
+- The next greater element is searched in `nums2` only, to the right of the value's position
+- Process `nums2` once instead of searching again for every query
+- A monotonic stack holds the values still waiting for a greater one, and each pop saves `value to greater` in a `HashMap`
+- Values still in the stack at the end have no greater element, so they are not in the map
+- Look up each `nums1` value with `getOrDefault(value, -1)`
+- All values are unique, so each value has exactly one answer
+
+**Examples**
+```
+Input:  nums1 = [4,1,2], nums2 = [1,3,4,2]
+Output: [-1,3,-1]
+
+Input:  nums1 = [2,4], nums2 = [1,2,3,4]
+Output: [3,-1]
+```
+
+**Constraints:** `1 <= nums1.length <= nums2.length <= 1000`, `0 <= nums1[i], nums2[i] <= 10^4`, all values unique, `nums1` is a subset of `nums2`
+
+**Approach:** Go through `nums2` with a stack of values. While the stack is not empty and the top is smaller than the current number `x`, pop it and save `top to x` in the map. Then push `x`. After that, answer each `nums1[i]` with `map.getOrDefault(nums1[i], -1)`. Simpler alternative: find each value's index in `nums2` and scan to the right until a larger number appears (`O(n1 * n2)`).
+
+**Complexity:** Time `O(n1 + n2)` · Space `O(n2)`
 
 [Back to index](#index)
