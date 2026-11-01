@@ -16,7 +16,7 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | **Matching** | Push openers, and when a closer arrives, pop and check that the top is its partner | 20 |
 | **Stack with extra data** | Each stack item carries more than its value (for example the minimum so far), so one pop restores everything | 155 |
 | **Evaluate / combine** | Push numbers, and when an operator arrives, pop the last two, combine them and push the result | 150 |
-| **Monotonic stack** | Keep the stack in sorted order. Pop while the new item breaks the order, and each pop finds an answer (store indices for distances, values for the answer itself, optionally in a `HashMap`) | 739, 496 |
+| **Monotonic stack** | Keep the stack in sorted order. Pop while the new item breaks the order, and each pop finds an answer (store indices for distances, values for the answer itself, optionally in a `HashMap`). For circular arrays, loop `2n` times with `i % n` | 739, 496, 503 |
 
 ---
 
@@ -29,8 +29,9 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | 150 | [Evaluate Reverse Polish Notation](#150-evaluate-reverse-polish-notation) | Medium | Evaluate / combine | [Java](LC150_EvaluateReversePolishNotation.java) |
 | 739 | [Daily Temperatures](#739-daily-temperatures) | Medium | Monotonic stack | [Java](LC739_DailyTemperatures.java) |
 | 496 | [Next Greater Element I](#496-next-greater-element-i) | Easy | Monotonic stack | [Java](LC496_NextGreaterElementI.java) |
+| 503 | [Next Greater Element II](#503-next-greater-element-ii) | Medium | Monotonic stack | [Java](LC503_NextGreaterElementII.java) |
 
-**Total solved: 5**
+**Total solved: 6**
 
 ---
 
@@ -204,5 +205,38 @@ Output: [3,-1]
 **Approach:** Go through `nums2` with a stack of values. While the stack is not empty and the top is smaller than the current number `x`, pop it and save `top to x` in the map. Then push `x`. After that, answer each `nums1[i]` with `map.getOrDefault(nums1[i], -1)`. Simpler alternative: find each value's index in `nums2` and scan to the right until a larger number appears (`O(n1 * n2)`).
 
 **Complexity:** Time `O(n1 + n2)` · Space `O(n2)`
+
+[Back to index](#index)
+
+---
+
+## 503. Next Greater Element II
+
+[LeetCode](https://leetcode.com/problems/next-greater-element-ii/) · Medium · [Solution](LC503_NextGreaterElementII.java)
+
+**Problem:** Given a circular integer array `nums` (after the last element comes the first one), return the next greater number for every element. Search circularly, and return `-1` if there is none.
+
+**Key points**
+- Circular means the array is walked **twice**: loop `i` from `0` to `2n - 1` and read `nums[i % n]`
+- `i % n` is always between `0` and `n - 1`, so there is no index error
+- Values can repeat, so store the answers by **index** in an array (a map keyed by value would overwrite)
+- Push indices only in the first pass (`i < n`), so every index waits only once
+- Use a strict `<`, so an equal value does not count as greater
+- Fill `ans` with `-1` at the start, because elements still in the stack at the end have no greater element
+
+**Examples**
+```
+Input:  nums = [1,2,1]
+Output: [2,-1,2]
+
+Input:  nums = [1,2,3,4,3]
+Output: [2,3,4,-1,4]
+```
+
+**Constraints:** `1 <= n <= 10^4`, `-10^9 <= nums[i] <= 10^9`
+
+**Approach:** Fill `ans` with `-1` and keep a stack of indices. For `i` from `0` to `2n - 1`, let `x = nums[i % n]`. While the stack is not empty and `nums[stack.peek()] < x`, pop the index and set `ans[index] = x`. If `i < n`, push `i`. Return `ans`.
+
+**Complexity:** Time `O(n)` · Space `O(n)`
 
 [Back to index](#index)
