@@ -17,6 +17,7 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | **Stack with extra data** | Each stack item carries more than its value (for example the minimum so far), so one pop restores everything | 155 |
 | **Evaluate / combine** | Push numbers, and when an operator arrives, pop the last two, combine them and push the result | 150 |
 | **Monotonic stack** | Keep the stack in sorted order. Pop while the new item breaks the order, and each pop finds an answer (store indices for distances, values for the answer itself, optionally in a `HashMap`). For circular arrays, loop `2n` times with `i % n` | 739, 496, 503 |
+| **Stack as current location** | Split the input into pieces. Push real names, pop on "go back" pieces, ignore the rest. Use `addLast` / `removeLast` so the order is kept when joining | 71 |
 
 ---
 
@@ -30,8 +31,9 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | 739 | [Daily Temperatures](#739-daily-temperatures) | Medium | Monotonic stack | [Java](LC739_DailyTemperatures.java) |
 | 496 | [Next Greater Element I](#496-next-greater-element-i) | Easy | Monotonic stack | [Java](LC496_NextGreaterElementI.java) |
 | 503 | [Next Greater Element II](#503-next-greater-element-ii) | Medium | Monotonic stack | [Java](LC503_NextGreaterElementII.java) |
+| 71 | [Simplify Path](#71-simplify-path) | Medium | Stack as current location | [Java](LC71_SimplifyPath.java) |
 
-**Total solved: 6**
+**Total solved: 7**
 
 ---
 
@@ -236,6 +238,46 @@ Output: [2,3,4,-1,4]
 **Constraints:** `1 <= n <= 10^4`, `-10^9 <= nums[i] <= 10^9`
 
 **Approach:** Fill `ans` with `-1` and keep a stack of indices. For `i` from `0` to `2n - 1`, let `x = nums[i % n]`. While the stack is not empty and `nums[stack.peek()] < x`, pop the index and set `ans[index] = x`. If `i < n`, push `i`. Return `ans`.
+
+**Complexity:** Time `O(n)` · Space `O(n)`
+
+[Back to index](#index)
+
+---
+
+## 71. Simplify Path
+
+[LeetCode](https://leetcode.com/problems/simplify-path/) · Medium · [Solution](LC71_SimplifyPath.java)
+
+**Problem:** Given an absolute Unix-style path (always starting with `/`), return its simplified canonical path.
+
+**Key points**
+- `.` means the current directory, and `..` means go up one directory (nothing happens at the root)
+- Multiple slashes count as one slash
+- `...` and `....` are valid folder names, so compare the whole piece and don't just check for a dot
+- `split("/")` gives pieces, including empty strings from `//` and from the leading `/`
+- Use `addLast` / `removeLast` on an `ArrayDeque`. With `push` / `pop` the folders come out in reverse order
+- Result: `"/"` plus the folders joined by `/`, and the empty stack gives `"/"`
+
+**Examples**
+```
+Input:  path = "/home/"
+Output: "/home"
+
+Input:  path = "/home//foo/"
+Output: "/home/foo"
+
+Input:  path = "/home/user/Documents/../Pictures"
+Output: "/home/user/Pictures"
+
+Input:  path = "/../"
+Output: "/"
+
+Input:  path = "/.../a/../b/c/../d/./"
+Output: "/.../b/d"
+```
+
+**Approach:** Split the path by `/`. For each piece: skip it if it is empty or `.`. If it is `..`, remove the last folder when the stack is not empty. Otherwise add it as the last folder. At the end, return `"/" + String.join("/", stack)`.
 
 **Complexity:** Time `O(n)` · Space `O(n)`
 
