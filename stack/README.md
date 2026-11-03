@@ -18,6 +18,7 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | **Evaluate / combine** | Push numbers, and when an operator arrives, pop the last two, combine them and push the result | 150 |
 | **Monotonic stack** | Keep the stack in sorted order. Pop while the new item breaks the order, and each pop finds an answer (store indices for distances, values for the answer itself, optionally in a `HashMap`). For circular arrays, loop `2n` times with `i % n` | 739, 496, 503 |
 | **Stack as current location** | Split the input into pieces. Push real names, pop on "go back" pieces, ignore the rest. Use `addLast` / `removeLast` so the order is kept when joining | 71 |
+| **Cancel adjacent pairs** | If the new item equals the top, remove the top. Otherwise add it. A `StringBuilder` can act as the stack | 1047 |
 
 ---
 
@@ -32,8 +33,9 @@ Quick-revision notes for the **Stack** pattern. Click a problem in the index to 
 | 496 | [Next Greater Element I](#496-next-greater-element-i) | Easy | Monotonic stack | [Java](LC496_NextGreaterElementI.java) |
 | 503 | [Next Greater Element II](#503-next-greater-element-ii) | Medium | Monotonic stack | [Java](LC503_NextGreaterElementII.java) |
 | 71 | [Simplify Path](#71-simplify-path) | Medium | Stack as current location | [Java](LC71_SimplifyPath.java) |
+| 1047 | [Remove All Adjacent Duplicates In String](#1047-remove-all-adjacent-duplicates-in-string) | Easy | Cancel adjacent pairs | [Java](LC1047_RemoveAllAdjacentDuplicates.java) |
 
-**Total solved: 7**
+**Total solved: 8**
 
 ---
 
@@ -278,6 +280,39 @@ Output: "/.../b/d"
 ```
 
 **Approach:** Split the path by `/`. For each piece: skip it if it is empty or `.`. If it is `..`, remove the last folder when the stack is not empty. Otherwise add it as the last folder. At the end, return `"/" + String.join("/", stack)`.
+
+**Complexity:** Time `O(n)` · Space `O(n)`
+
+[Back to index](#index)
+
+---
+
+## 1047. Remove All Adjacent Duplicates In String
+
+[LeetCode](https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/) · Easy · [Solution](LC1047_RemoveAllAdjacentDuplicates.java)
+
+**Problem:** Given a string of lowercase letters, repeatedly remove two adjacent equal letters until no more can be removed. Return the final string.
+
+**Key points**
+- After a removal, the letters on both sides become neighbours, so removals can chain (`"abba"` becomes `""`)
+- The stack keeps the letters that are still "alive", and the top is the most recent one
+- Use `if / else`: either cancel the pair or add the letter, never both
+- Check `isEmpty()` before `peekLast()`
+- A `StringBuilder` with `deleteCharAt(last)` works as a stack and is faster than a `Deque<Character>` (no boxing)
+- The answer is unique, whatever order the pairs are removed in
+
+**Examples**
+```
+Input:  s = "abbaca"
+Output: "ca"
+
+Input:  s = "azxxzy"
+Output: "ay"
+```
+
+**Constraints:** `1 <= s.length <= 10^5`, lowercase English letters only
+
+**Approach:** Go through the letters with a stack. If the stack is not empty and its top equals the current letter, remove the top. Otherwise add the letter. At the end, the stack (read from bottom to top) is the answer. With `addLast` / `removeLast`, iterating the deque already gives the correct order.
 
 **Complexity:** Time `O(n)` · Space `O(n)`
 
