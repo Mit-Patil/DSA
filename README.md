@@ -2,7 +2,7 @@
 
 Pattern-by-pattern LeetCode solutions with quick-revision notes. Open a pattern to see when to use it, the problem summaries and sample test cases, and the Java solutions.
 
-**Total solved: 40**
+**Total solved: 41**
 
 | Pattern | Solved | Good for |
 |---------|--------|----------|
@@ -11,3 +11,4 @@ Pattern-by-pattern LeetCode solutions with quick-revision notes. Open a pattern 
 | [Binary Search](binary-search/README.md) | 8 | Sorted arrays, O(log n) search, first/last position, search on the answer, rotated arrays |
 | [Hashing](hashing/README.md) | 8 | Duplicates, frequency counts, pair lookups, sets, grouping, mappings |
 | [Stack](stack/README.md) | 8 | Matching pairs, design problems, evaluating expressions, monotonic stack, path handling, cancelling pairs |
+| [Heap / Top K](heap/README.md) | 1 | Biggest/smallest item again and again, k-th largest, top k (in progress) |
