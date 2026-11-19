@@ -15,6 +15,7 @@ Quick-revision notes for the **Heap** pattern (`PriorityQueue` in Java). Click a
 |-------|------|---------|
 | **Max-heap** | `new PriorityQueue<>(Collections.reverseOrder())`, always take the biggest, change it, put the result back | 1046 |
 | **Min-heap of size k** | Keep only the `k` largest items. The top is the smallest of them, which is the k-th largest. If the size goes above `k`, `poll` | 703, 215 |
+| **Custom order** | The heap stores items (numbers, points) and the comparator calculates a score. `poll()` removes whatever the comparator puts first, so the item to throw away must be on top: lowest count for "k most frequent" (347), farthest distance for "k closest" (973) | 347, 973 |
 
 ---
 
@@ -25,8 +26,10 @@ Quick-revision notes for the **Heap** pattern (`PriorityQueue` in Java). Click a
 | 1046 | [Last Stone Weight](#1046-last-stone-weight) | Easy | Max-heap | [Java](LC1046_LastStoneWeight.java) |
 | 703 | [Kth Largest Element in a Stream](#703-kth-largest-element-in-a-stream) | Easy | Min-heap of size k | [Java](LC703_KthLargestElementInAStream.java) |
 | 215 | [Kth Largest Element in an Array](#215-kth-largest-element-in-an-array) | Medium | Min-heap of size k | [Java](LC215_KthLargestElementInAnArray.java) |
+| 347 | [Top K Frequent Elements](#347-top-k-frequent-elements) | Medium | Custom order | [Java](LC347_TopKFrequentElements.java) |
+| 973 | [K Closest Points to Origin](#973-k-closest-points-to-origin) | Medium | Custom order | [Java](LC973_KClosestPointsToOrigin.java) |
 
-**Total solved: 3**
+**Total solved: 5**
 
 ---
 
@@ -123,6 +126,78 @@ Output: 4
 **Constraints:** `1 <= k <= nums.length <= 10^5`, `-10^4 <= nums[i] <= 10^4`
 
 **Approach:** Go through the array with a min-heap. Add each number, and if the size goes above `k`, `poll` the smallest. After the loop, `peek()` is the k-th largest.
+
+**Complexity:** Time `O(n log k)` · Space `O(k)`
+
+[Back to index](#index)
+
+---
+
+## 347. Top K Frequent Elements
+
+[LeetCode](https://leetcode.com/problems/top-k-frequent-elements/) · Medium · [Solution](LC347_TopKFrequentElements.java)
+
+**Problem:** Given an integer array `nums` and an integer `k`, return the `k` most frequent elements, in any order.
+
+**Key points**
+- Two steps: count with a `HashMap`, then keep the top `k` with a heap
+- A heap of plain numbers orders by value, so it needs a comparator that orders by **count**
+- The heap stores the numbers, and the comparator looks up `count.get(number)`
+- The `HashMap` must be declared before the heap, because the comparator uses it
+- Loop over the **distinct** numbers (`keySet()`), not over every element
+- Use a min-heap by count of size `k`: when the size goes above `k`, `poll` removes the least frequent number
+- The result comes out from the least to the most frequent, and any order is accepted
+- Scanning for the maximum `k` times is `O(k * d)`, which can reach `O(n^2)`
+
+**Examples**
+```
+Input:  nums = [1,1,1,2,2,3], k = 2
+Output: [1,2]
+
+Input:  nums = [1], k = 1
+Output: [1]
+
+Input:  nums = [1,2,1,2,1,2,3,1,3,2], k = 2
+Output: [1,2]
+```
+
+**Constraints:** `1 <= nums.length <= 10^5`, `-10^4 <= nums[i] <= 10^4`, `k` is between `1` and the number of distinct elements, the answer is unique
+
+**Approach:** Count every number with `count.merge(n, 1, Integer::sum)`. Create a min-heap with the comparator `(a, b) -> Integer.compare(count.get(a), count.get(b))`. For each distinct number, add it, and if the size goes above `k`, `poll`. Then poll the `k` remaining numbers into the answer array. A faster alternative is bucket sort (an array where the index is the frequency), which is `O(n)`.
+
+**Complexity:** Time `O(n + d log k)` (`d` is the number of distinct values, at most `O(n log k)`) · Space `O(d + k)`
+
+[Back to index](#index)
+
+---
+
+## 973. K Closest Points to Origin
+
+[LeetCode](https://leetcode.com/problems/k-closest-points-to-origin/) · Medium · [Solution](LC973_KClosestPointsToOrigin.java)
+
+**Problem:** Given an array of points `[x, y]` and an integer `k`, return the `k` points closest to the origin `(0, 0)`, in any order.
+
+**Key points**
+- Compare the squared distance `x * x + y * y`, because the square root never changes which point is closer, and skipping it avoids decimals
+- Square each coordinate, adding them (`x + y`) is a different number and gives wrong answers
+- For the `k` **smallest** distances, use a **max-heap** by distance, so the farthest of the kept points is on top and is the one `poll` removes
+- With `Integer.compare(d(b), d(a))`, the larger distance goes first (top)
+- A negative result from the comparator means the first argument goes closer to the top
+- Points are `int[]`, so `p[0]` is `x` and `p[1]` is `y`
+- `maxHeap.toArray(new int[k][])` gives the result, since the heap holds exactly `k` points at the end
+
+**Examples**
+```
+Input:  points = [[1,3],[-2,2]], k = 1
+Output: [[-2,2]]
+
+Input:  points = [[3,3],[5,-1],[-2,4]], k = 2
+Output: [[3,3],[-2,4]]
+```
+
+**Constraints:** `1 <= k <= points.length <= 10^4`, `-10^4 <= xi, yi <= 10^4`
+
+**Approach:** Create a max-heap of points with the comparator `(a, b) -> Integer.compare(dist(b), dist(a))`, where `dist(p) = p[0] * p[0] + p[1] * p[1]`. Add each point, and if the size goes above `k`, `poll` the farthest. The heap then holds the `k` closest points. Sorting all points would be `O(n log n)`, and quickselect is `O(n)` on average.
 
 **Complexity:** Time `O(n log k)` · Space `O(k)`
 
