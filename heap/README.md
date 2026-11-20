@@ -15,7 +15,7 @@ Quick-revision notes for the **Heap** pattern (`PriorityQueue` in Java). Click a
 |-------|------|---------|
 | **Max-heap** | `new PriorityQueue<>(Collections.reverseOrder())`, always take the biggest, change it, put the result back | 1046 |
 | **Min-heap of size k** | Keep only the `k` largest items. The top is the smallest of them, which is the k-th largest. If the size goes above `k`, `poll` | 703, 215 |
-| **Custom order** | The heap stores items (numbers, points) and the comparator calculates a score. `poll()` removes whatever the comparator puts first, so the item to throw away must be on top: lowest count for "k most frequent" (347), farthest distance for "k closest" (973) | 347, 973 |
+| **Custom order** | The heap stores items (numbers, words, points) and the comparator calculates a score. `poll()` removes whatever the comparator puts first, so the item to throw away must be on top: lowest count for "k most frequent" (347), farthest distance for "k closest" (973). Add a **tie-break** when scores can be equal (692) | 347, 973, 692 |
 
 ---
 
@@ -28,8 +28,9 @@ Quick-revision notes for the **Heap** pattern (`PriorityQueue` in Java). Click a
 | 215 | [Kth Largest Element in an Array](#215-kth-largest-element-in-an-array) | Medium | Min-heap of size k | [Java](LC215_KthLargestElementInAnArray.java) |
 | 347 | [Top K Frequent Elements](#347-top-k-frequent-elements) | Medium | Custom order | [Java](LC347_TopKFrequentElements.java) |
 | 973 | [K Closest Points to Origin](#973-k-closest-points-to-origin) | Medium | Custom order | [Java](LC973_KClosestPointsToOrigin.java) |
+| 692 | [Top K Frequent Words](#692-top-k-frequent-words) | Medium | Custom order + tie-break | [Java](LC692_TopKFrequentWords.java) |
 
-**Total solved: 5**
+**Total solved: 6**
 
 ---
 
@@ -200,5 +201,40 @@ Output: [[3,3],[-2,4]]
 **Approach:** Create a max-heap of points with the comparator `(a, b) -> Integer.compare(dist(b), dist(a))`, where `dist(p) = p[0] * p[0] + p[1] * p[1]`. Add each point, and if the size goes above `k`, `poll` the farthest. The heap then holds the `k` closest points. Sorting all points would be `O(n log n)`, and quickselect is `O(n)` on average.
 
 **Complexity:** Time `O(n log k)` · Space `O(k)`
+
+[Back to index](#index)
+
+---
+
+## 692. Top K Frequent Words
+
+[LeetCode](https://leetcode.com/problems/top-k-frequent-words/) · Medium · [Solution](LC692_TopKFrequentWords.java)
+
+**Problem:** Given an array of strings `words` and an integer `k`, return the `k` most frequent words, sorted by frequency from highest to lowest. Words with the same frequency are sorted in alphabetical order.
+
+**Key points**
+- Same idea as 347 (count with a `HashMap`, then a min-heap of size `k`), but words with the **same count** need a tie-break
+- Comparing only the counts leaves ties unordered, so the wrong word can be removed and the output order can be wrong
+- `poll()` removes whatever the comparator puts first, so the **worst** candidate must come first: lower count first, and for equal counts the alphabetically **later** word first
+- `b.compareTo(a)` gives that reverse alphabetical order (`a.compareTo(b)` would keep the wrong words)
+- `Integer.compare(cb, ca)` in the tie branch would compare two equal counts and always return `0`
+- The heap pops from the worst to the best, so use `Collections.reverse` on the result
+- Declare the `HashMap` before the heap, because the comparator uses it
+- Unbox the counts into `int` variables before comparing with `!=`, to avoid the Integer cache trap
+
+**Examples**
+```
+Input:  words = ["i","love","leetcode","i","love","coding"], k = 2
+Output: ["i","love"]
+
+Input:  words = ["the","day","is","sunny","the","the","the","sunny","is","is"], k = 4
+Output: ["the","is","sunny","day"]
+```
+
+**Constraints:** `1 <= words.length <= 500`, `1 <= words[i].length <= 10`, lowercase English letters, `k` is between `1` and the number of unique words. Follow-up: `O(n log k)` time and `O(n)` extra space
+
+**Approach:** Count every word with `merge`. Create a min-heap of words with the comparator: if the counts differ, `Integer.compare(ca, cb)`, otherwise `b.compareTo(a)`. For each distinct word, add it, and if the size goes above `k`, `poll`. Then poll all remaining words into a list and reverse it.
+
+**Complexity:** Time `O(n + d log k)` (`d` is the number of distinct words) · Space `O(d + k)`
 
 [Back to index](#index)
