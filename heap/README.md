@@ -15,7 +15,7 @@ Quick-revision notes for the **Heap** pattern (`PriorityQueue` in Java). Click a
 |-------|------|---------|
 | **Max-heap** | `new PriorityQueue<>(Collections.reverseOrder())`, always take the biggest, change it, put the result back | 1046 |
 | **Min-heap of size k** | Keep only the `k` largest items. The top is the smallest of them, which is the k-th largest. If the size goes above `k`, `poll` | 703, 215 |
-| **Custom order** | The heap stores items (numbers, words, points) and the comparator calculates a score. `poll()` removes whatever the comparator puts first, so the item to throw away must be on top: lowest count for "k most frequent" (347), farthest distance for "k closest" (973). Add a **tie-break** when scores can be equal (692) | 347, 973, 692 |
+| **Custom order** | The heap stores items (numbers, words, points, row indices) and the comparator calculates a score. `poll()` removes whatever the comparator puts first, so the item to throw away must be on top: lowest count for "k most frequent" (347), farthest distance for "k closest" (973). Add a **tie-break** when scores can be equal: alphabetical order (692) or the index itself (1337) | 347, 973, 692, 1337 |
 
 ---
 
@@ -29,8 +29,9 @@ Quick-revision notes for the **Heap** pattern (`PriorityQueue` in Java). Click a
 | 347 | [Top K Frequent Elements](#347-top-k-frequent-elements) | Medium | Custom order | [Java](LC347_TopKFrequentElements.java) |
 | 973 | [K Closest Points to Origin](#973-k-closest-points-to-origin) | Medium | Custom order | [Java](LC973_KClosestPointsToOrigin.java) |
 | 692 | [Top K Frequent Words](#692-top-k-frequent-words) | Medium | Custom order + tie-break | [Java](LC692_TopKFrequentWords.java) |
+| 1337 | [The K Weakest Rows in a Matrix](#1337-the-k-weakest-rows-in-a-matrix) | Easy | Custom order + tie-break | [Java](LC1337_TheKWeakestRowsInAMatrix.java) |
 
-**Total solved: 6**
+**Total solved: 7**
 
 ---
 
@@ -236,5 +237,46 @@ Output: ["the","is","sunny","day"]
 **Approach:** Count every word with `merge`. Create a min-heap of words with the comparator: if the counts differ, `Integer.compare(ca, cb)`, otherwise `b.compareTo(a)`. For each distinct word, add it, and if the size goes above `k`, `poll`. Then poll all remaining words into a list and reverse it.
 
 **Complexity:** Time `O(n + d log k)` (`d` is the number of distinct words) · Space `O(d + k)`
+
+[Back to index](#index)
+
+---
+
+## 1337. The K Weakest Rows in a Matrix
+
+[LeetCode](https://leetcode.com/problems/the-k-weakest-rows-in-a-matrix/) · Easy · [Solution](LC1337_TheKWeakestRowsInAMatrix.java)
+
+**Problem:** A binary matrix has `1`s (soldiers) on the left and `0`s (civilians) on the right in every row. Row `i` is weaker than row `j` if it has fewer soldiers, or the same number of soldiers and `i < j`. Return the indices of the `k` weakest rows, ordered from weakest to strongest.
+
+**Key points**
+- Count the soldiers of each row in an `int[]` (a `HashMap` that only stores rows with soldiers causes a `NullPointerException` for a row of all `0`s)
+- The heap stores **row indices**, and the comparator looks up `soldiers[row]`
+- For the `k` weakest rows, use a **max-heap**, so the strongest of the kept rows is on top and is the one `poll` removes
+- Different counts: `Integer.compare(soldiers[b], soldiers[a])` puts the stronger row first
+- Same count: `Integer.compare(b, a)` puts the larger index first, because it is the stronger one on a tie. Comparing the counts again would always return `0`
+- `poll()` gives the strongest first, so fill the result array **from the back** (`k - 1` down to `0`)
+- Each row is sorted, so the soldiers could also be counted with a binary search
+
+**Examples**
+```
+Input:  mat = [[1,1,0,0,0],
+               [1,1,1,1,0],
+               [1,0,0,0,0],
+               [1,1,0,0,0],
+               [1,1,1,1,1]], k = 3
+Output: [2,0,3]
+
+Input:  mat = [[1,0,0,0],
+               [1,1,1,1],
+               [1,0,0,0],
+               [1,0,0,0]], k = 2
+Output: [0,2]
+```
+
+**Constraints:** `m == mat.length`, `n == mat[i].length`, `2 <= n, m <= 100`, `1 <= k <= m`, `mat[i][j]` is `0` or `1`
+
+**Approach:** Count the `1`s of every row into `soldiers[]`. Create a max-heap of row indices ordered by soldiers (more soldiers first), and on equal soldiers by the larger index first. Add each row index, and if the size goes above `k`, `poll`. Then poll the remaining rows into the result from the last position to the first.
+
+**Complexity:** Time `O(m * n + m log k)` · Space `O(m)`
 
 [Back to index](#index)
