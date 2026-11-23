@@ -13,7 +13,7 @@ Quick-revision notes for the **Heap** pattern (`PriorityQueue` in Java). Click a
 
 | Style | Idea | Used in |
 |-------|------|---------|
-| **Max-heap** | `new PriorityQueue<>(Collections.reverseOrder())`, always take the biggest, change it, put the result back | 1046 |
+| **Max-heap** | `new PriorityQueue<>(Collections.reverseOrder())`, always take the biggest, change it, put the result back | 1046, 1962 |
 | **Min-heap of size k** | Keep only the `k` largest items. The top is the smallest of them, which is the k-th largest. If the size goes above `k`, `poll` | 703, 215 |
 | **Custom order** | The heap stores items (numbers, words, points, row indices) and the comparator calculates a score. `poll()` removes whatever the comparator puts first, so the item to throw away must be on top: lowest count for "k most frequent" (347), farthest distance for "k closest" (973). Add a **tie-break** when scores can be equal: alphabetical order (692) or the index itself (1337) | 347, 973, 692, 1337 |
 
@@ -30,8 +30,9 @@ Quick-revision notes for the **Heap** pattern (`PriorityQueue` in Java). Click a
 | 973 | [K Closest Points to Origin](#973-k-closest-points-to-origin) | Medium | Custom order | [Java](LC973_KClosestPointsToOrigin.java) |
 | 692 | [Top K Frequent Words](#692-top-k-frequent-words) | Medium | Custom order + tie-break | [Java](LC692_TopKFrequentWords.java) |
 | 1337 | [The K Weakest Rows in a Matrix](#1337-the-k-weakest-rows-in-a-matrix) | Easy | Custom order + tie-break | [Java](LC1337_TheKWeakestRowsInAMatrix.java) |
+| 1962 | [Remove Stones to Minimize the Total](#1962-remove-stones-to-minimize-the-total) | Medium | Max-heap | [Java](LC1962_RemoveStonesToMinimizeTheTotal.java) |
 
-**Total solved: 7**
+**Total solved: 8**
 
 ---
 
@@ -278,5 +279,39 @@ Output: [0,2]
 **Approach:** Count the `1`s of every row into `soldiers[]`. Create a max-heap of row indices ordered by soldiers (more soldiers first), and on equal soldiers by the larger index first. Add each row index, and if the size goes above `k`, `poll`. Then poll the remaining rows into the result from the last position to the first.
 
 **Complexity:** Time `O(m * n + m log k)` · Space `O(m)`
+
+[Back to index](#index)
+
+---
+
+## 1962. Remove Stones to Minimize the Total
+
+[LeetCode](https://leetcode.com/problems/remove-stones-to-minimize-the-total/) · Medium · [Solution](LC1962_RemoveStonesToMinimizeTheTotal.java)
+
+**Problem:** Given an array `piles` and an integer `k`, apply this operation exactly `k` times: choose any pile and remove `floor(piles[i] / 2)` stones from it. Return the minimum possible total number of stones left. The same pile can be chosen more than once.
+
+**Key points**
+- Halving a bigger pile removes more stones, so always operate on the **biggest** pile, which a max-heap gives in `O(log n)`
+- After the operation the pile goes **back** into the heap with its new size, because it may still be the biggest
+- The new size is `p - p / 2` (the stones left, which is `ceil(p / 2)`), not `p / 2` (the stones removed)
+- A pile of `1` never changes, because `1 / 2` is `0`
+- The answer is the sum of what is left in the heap, or a running total that goes down by `p / 2` each time
+- Same idea as 1046 (take the top, change it, put it back)
+- The total is at most `10^9`, so an `int` is enough
+
+**Examples**
+```
+Input:  piles = [5,4,9], k = 2
+Output: 12
+
+Input:  piles = [4,3,6,7], k = 3
+Output: 12
+```
+
+**Constraints:** `1 <= piles.length <= 10^5`, `1 <= piles[i] <= 10^4`, `1 <= k <= 10^5`
+
+**Approach:** Put all piles in a max-heap. Repeat `k` times: poll the biggest pile `p`, and add `p - p / 2` back. At the end, return the sum of all piles left in the heap (or keep a running total and subtract `p / 2` at every step).
+
+**Complexity:** Time `O((n + k) log n)` · Space `O(n)`
 
 [Back to index](#index)
